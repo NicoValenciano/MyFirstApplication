@@ -1,12 +1,12 @@
 package com.example.myfirstapplication.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
@@ -26,7 +26,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.myfirstapplication.models.Age
+import com.example.myfirstapplication.models.RetrofitClient
 import com.example.myfirstapplication.navigation.AppScreens
+import kotlinx.coroutines.delay
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -45,30 +51,44 @@ fun FirstScreen(navController: NavController){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BodyContent( navController: NavController,modifier: Modifier = Modifier) {
-    var texto by remember { mutableStateOf("") }
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
+    var text by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
 
     Surface(color = Color.White) {
         Column (modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center ,horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Hi, my name is Nicolas Valenciano",
+                text = "Hola, ingresá tu nombre y la api Agify.io va a predecir tu edad",
                 modifier = modifier.padding(24.dp),
                 fontSize = 40.sp,
                 lineHeight = 50.sp,
                 textAlign = TextAlign.Center
             )
+            Spacer(modifier = Modifier.width(20.dp))
             OutlinedTextField(
-                value = texto,
-                onValueChange = { texto = it },
-                label = { Text(text = "Enter text") }
+                value = name,
+                onValueChange = { name = it },
+                label = { Text(text = "Ingresar nombre") }
             )
             Button(
                 onClick = {
-                    navController.navigate(AppScreens.SecondScreen.route + "/${texto}")
+                    val retrofitTraer = RetrofitClient.consumirApi.getAge(name)
+
+                    retrofitTraer.enqueue(object : Callback<Age> {
+                        override fun onResponse(call: Call<Age>, response: Response<Age>) {
+                            val ageValue = response.body()?.age
+                            text = ageValue?.toString() ?: "Edad no disponible"
+                        }
+                        override fun onFailure(call: Call<Age>, t: Throwable){
+                            text = ("Error al consultar Api Rest")
+                        }
+                    })
+
+                    if (text.isNotBlank()) {
+                        navController.navigate(AppScreens.SecondScreen.route + "/${text}")
+                    }
                 },
                 modifier = modifier.padding(24.dp)){
-                    Text("Send")
+                    Text("Enviar")
             }
         }
     }

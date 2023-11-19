@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import kotlin.math.roundToInt
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +40,7 @@ fun SecondScreen(navController: NavHostController, text: String?){
                         navController.popBackStack()
                     })
                 Spacer(modifier = Modifier.width(20.dp))
-                Text(text = "SecondScreen")
+                Text(text = "Resultado de la api")
             }
         })
     }){
@@ -55,13 +56,35 @@ fun SecondBodyContent(navController: NavController, text: String?){
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text(
+            text = "Tu edad es:",
+            modifier = Modifier.padding(20.dp),
+            fontSize = 40.sp,
+            lineHeight = 50.sp,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.width(20.dp))
+
         text?.let{
-            Text(it,
-                modifier = Modifier.padding(24.dp),
-                fontSize = 40.sp,
-                lineHeight = 50.sp,
-                textAlign = TextAlign.Center)
-        }
+            val floatValue = it.toFloatOrNull()
+            val roundedValue = floatValue?.roundToInt()
+
+            roundedValue?.let {
+                Text(
+                    it.toString(),
+                    modifier = Modifier.padding(24.dp),
+                    fontSize = 40.sp,
+                    lineHeight = 50.sp,
+                    textAlign = TextAlign.Center
+                )
+            } ?: run {
+                Text(it,
+                    modifier = Modifier.padding(24.dp),
+                    fontSize = 40.sp,
+                    lineHeight = 50.sp,
+                    textAlign = TextAlign.Center)
+        }}
+        Spacer(modifier = Modifier.width(20.dp))
         Button(onClick = {
             navController.popBackStack()
         }) {
