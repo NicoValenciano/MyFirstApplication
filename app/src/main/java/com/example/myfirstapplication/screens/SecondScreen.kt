@@ -64,7 +64,6 @@ fun SecondBodyContent(navController: NavController, text: String?){
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.width(20.dp))
-
         text?.let{
             val floatValue = it.toFloatOrNull()
             val roundedValue = floatValue?.roundToInt()
@@ -88,7 +87,7 @@ fun SecondBodyContent(navController: NavController, text: String?){
         Button(onClick = {
             navController.popBackStack()
         }) {
-            Text("Back")
+            Text("Volver atrás")
 
         }
     }
